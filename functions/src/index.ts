@@ -1,11 +1,10 @@
 import { Pinecone } from '@pinecone-database/pinecone'
 import { Scraper } from '@the-convocation/twitter-scraper'
+import * as admin from 'firebase-admin'
 import { getFirestore } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
-import * as admin from 'firebase-admin'
-import { onDocumentCreated } from 'firebase-functions/firestore'
-import OpenAI from 'openai'
 import { defineSecret } from 'firebase-functions/params'
+import OpenAI from 'openai'
 
 const pineconeApiKey = defineSecret('PINECONE_API_KEY')
 const openaiApiKey = defineSecret('OPENAI_API_KEY')
@@ -46,68 +45,77 @@ export const createTwitterDocument = functions.https.onCall<{ url: string }>(asy
   return { success: true }
 })
 
-export const onTweetCreated = onDocumentCreated('/tweets/{tweetId}', async event => {
-  try {
-    if (!event.data) {
-      console.log('No tweet data found')
-      return
+export const onTweetCreated = functions.firestore.onDocumentCreated(
+  {
+    document: 'tweets/{tweetId}',
+    secrets: [pineconeApiKey, openaiApiKey],
+  },
+  async event => {
+    try {
+      if (!event.data) {
+        console.log('No tweet data found')
+        return
+      }
+      const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
+      const openai = new OpenAI({
+        apiKey: openaiApiKey.value(),
+      })
+
+      const tweetData = event.data.data() as TweetData
+
+      const emb = await openai.embeddings.create({
+        model: 'text-embedding-ada-002',
+        input: tweetData.text,
+      })
+
+      const index = pinecone.index('tweets-vector-index')
+      await index.upsert([
+        {
+          id: tweetData.tweetId,
+          values: emb.data[0].embedding,
+          metadata: {
+            text: tweetData.text,
+            authorUsername: tweetData.authorUsername,
+            authorId: tweetData.authorId,
+            createdAt: tweetData.createdAt,
+          },
+        },
+      ])
+
+      console.log('Tweet created and indexed')
+    } catch (error) {
+      console.error('Error creating tweet and indexing', error)
+      throw error
     }
-    const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
+  }
+)
+
+export const searchTweets = functions.https.onCall<{ prompt: string }>(
+  { secrets: [pineconeApiKey, openaiApiKey] },
+  async (data, context) => {
+    const prompt = data.data.prompt
+    if (!prompt) {
+      throw new functions.https.HttpsError('invalid-argument', 'No prompt found')
+    }
     const openai = new OpenAI({
       apiKey: openaiApiKey.value(),
+      dangerouslyAllowBrowser: true,
     })
-
-    const tweetData = event.data.data() as TweetData
-
-    const emb = await openai.embeddings.create({
-      model: 'text-embedding-ada-002',
-      input: tweetData.text,
-    })
-
+    const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
     const index = pinecone.index('tweets-vector-index')
-    await index.upsert([
-      {
-        id: tweetData.tweetId,
-        values: emb.data[0].embedding,
-        metadata: {
-          text: tweetData.text,
-          authorUsername: tweetData.authorUsername,
-          authorId: tweetData.authorId,
-          createdAt: tweetData.createdAt,
-        },
-      },
-    ])
 
-    console.log('Tweet created and indexed')
-  } catch (error) {
-    console.error('Error creating tweet and indexing', error)
-    throw error
+    const embededPrompt = await openai.embeddings.create({
+      input: prompt,
+      model: 'text-embedding-ada-002',
+    })
+
+    const queryVector = embededPrompt.data[0].embedding
+    const queryResponse = await index.query({
+      topK: 10,
+      includeMetadata: true,
+      vector: queryVector,
+    })
+
+    return queryResponse
   }
-})
-
-export const searchTweets = functions.https.onCall<{ prompt: string }>(async (data, context) => {
-  const prompt = data.data.prompt
-  if (!prompt) {
-    throw new functions.https.HttpsError('invalid-argument', 'No prompt found')
-  }
-  const openai = new OpenAI({
-    apiKey: openaiApiKey.value(),
-    dangerouslyAllowBrowser: true,
-  })
-  const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
-  const index = pinecone.index('tweets-vector-index')
-
-  const embededPrompt = await openai.embeddings.create({
-    input: prompt,
-    model: 'text-embedding-ada-002',
-  })
-
-  const queryVector = embededPrompt.data[0].embedding
-  const queryResponse = await index.query({
-    topK: 10,
-    includeMetadata: true,
-    vector: queryVector,
-  })
-
-  return queryResponse
-})
+)
