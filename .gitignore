@@ -70,3 +70,4 @@ node_modules/
 
 .env.development
 functions/.env.development
+Embedding_Strategy_and_Workflow.md
