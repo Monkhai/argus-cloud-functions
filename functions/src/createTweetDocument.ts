@@ -7,6 +7,7 @@ import { tweetDocumentSchema, tweetSchema } from './schemas'
 import { openaiApiKey, pineconeApiKey } from './secrets'
 import { Pinecone } from '@pinecone-database/pinecone'
 import OpenAI from 'openai'
+import { getIndexId } from './utils'
 
 type CreateTweetDocumentRequest = {
   url: string
@@ -41,7 +42,7 @@ export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentR
 
     const tweetDoc: TweetData = {
       tweetId,
-      createdAt: tweet.timestamp,
+      createdAt: new Date(tweet.timestamp).toISOString(),
       text: tweet.text,
       authorUsername: tweet.username,
       authorId: tweet.userId,
@@ -89,7 +90,7 @@ export const onTweetCreatedFn = functions.firestore.onDocumentCreated(
         input: JSON.stringify(tweetContentForEmbedding, Object.keys(tweetContentForEmbedding).sort()),
       })
 
-      const indexId = tweetDocument.userId
+      const indexId = getIndexId(tweetDocument.userId)
       const index = pinecone.index(indexId)
 
       await index.upsert([

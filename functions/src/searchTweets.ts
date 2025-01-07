@@ -4,6 +4,7 @@ import { HttpsError } from 'firebase-functions/https'
 import OpenAI from 'openai'
 import { Pinecone } from '@pinecone-database/pinecone'
 import { TweetContentForEmbedding, TweetData } from './types'
+import { getIndexId } from './utils'
 
 type SearchTweetsRequest = {
   prompt: string
@@ -50,9 +51,9 @@ export const searchTweetsFn = functions.https.onCall<SearchTweetsRequest, Promis
     if (!enrichedPrompt) {
       throw new functions.https.HttpsError('invalid-argument', 'No enriched prompt found')
     }
-    // Then create embedding with the enriched prompt
+
     const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
-    const index = pinecone.index(req.auth.uid)
+    const index = pinecone.index(getIndexId(req.auth.uid))
 
     const tweetToEmbed = getStructuredQuery({
       query: enrichedPrompt,

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const tweetSchema = z.object({
-  timestamp: z.string(),
+  timestamp: z.number(),
   text: z.string(),
   username: z.string(),
   userId: z.string(),
