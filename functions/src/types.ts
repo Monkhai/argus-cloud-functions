@@ -15,6 +15,7 @@ export type ResourceData = {
   tags: string[]
   description: string
   userId: string
+  link: string
 }
 
 export type ResourceContentForEmbedding = {

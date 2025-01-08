@@ -61,6 +61,7 @@ export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentR
         authorUsername: tweet.username,
         authorId: tweet.userId,
         userId: data.auth.uid,
+        link: url.toString(),
         tags: metadata.tags,
         description: metadata.description,
       }
