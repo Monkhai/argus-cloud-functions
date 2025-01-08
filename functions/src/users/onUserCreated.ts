@@ -2,9 +2,9 @@ import { Pinecone } from '@pinecone-database/pinecone'
 import { getFirestore } from 'firebase-admin/firestore'
 import { error, log } from 'firebase-functions/logger'
 import * as functions from 'firebase-functions/v1'
-import { DIMENSIONS, METRIC } from './constants'
-import { pineconeApiKey } from './secrets'
-import { getIndexId } from './utils'
+import { DIMENSIONS, METRIC } from '../constants'
+import { pineconeApiKey } from '../secrets'
+import { getIndexId } from '../utils'
 
 export const onUserCreatedFn = functions
   .runWith({ secrets: [pineconeApiKey] })
