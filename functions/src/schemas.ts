@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { resourceType } from './types'
+
+export type ParsedTweet = z.infer<typeof tweetSchema>
 
 export const tweetSchema = z.object({
   timestamp: z.number(),
@@ -7,8 +10,9 @@ export const tweetSchema = z.object({
   userId: z.string(),
 })
 
-export const tweetDocumentSchema = z.object({
-  tweetId: z.string(),
+export const resourceDocumentSchema = z.object({
+  type: z.enum(resourceType),
+  resourceId: z.string(),
   createdAt: z.string(),
   text: z.string(),
   authorUsername: z.string(),

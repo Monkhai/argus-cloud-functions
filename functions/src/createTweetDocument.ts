@@ -1,13 +1,10 @@
-import * as functions from 'firebase-functions'
-import { TweetContentForEmbedding, TweetData, UserMetadata } from './types'
-import { HttpsError } from 'firebase-functions/https'
 import { Scraper } from '@the-convocation/twitter-scraper'
 import { getFirestore } from 'firebase-admin/firestore'
-import { tweetDocumentSchema, tweetSchema } from './schemas'
-import { openaiApiKey, pineconeApiKey } from './secrets'
-import { Pinecone } from '@pinecone-database/pinecone'
-import OpenAI from 'openai'
-import { getIndexId } from './utils'
+import * as functions from 'firebase-functions'
+import { HttpsError } from 'firebase-functions/https'
+import { error, log } from 'firebase-functions/logger'
+import { ParsedTweet, tweetSchema } from './schemas'
+import { ResourceData, ResourceType, UserMetadata } from './types'
 
 type CreateTweetDocumentRequest = {
   url: string
@@ -20,98 +17,62 @@ type CreateTweetDocumentResponse = {
 
 export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentRequest, Promise<CreateTweetDocumentResponse>>(
   async data => {
-    if (!data.auth) {
-      throw new HttpsError('permission-denied', 'User not authenticated')
-    }
-
-    const tweetId = data.data.url.split('/').pop()
-    if (!tweetId) {
-      throw new functions.https.HttpsError('invalid-argument', 'No tweet ID found')
-    }
-    const metadata = data.data.userMetadata as UserMetadata
-    if (!metadata) {
-      throw new functions.https.HttpsError('invalid-argument', 'No user metadata found')
-    }
-    const scraper = new Scraper()
-    const tweetData = await scraper.getTweet(tweetId)
-    if (!tweetData) {
-      throw new functions.https.HttpsError('invalid-argument', 'No tweet data found')
-    }
-
-    const tweet = tweetSchema.parse(tweetData)
-
-    const tweetDoc: TweetData = {
-      tweetId,
-      createdAt: new Date(tweet.timestamp).toISOString(),
-      text: tweet.text,
-      authorUsername: tweet.username,
-      authorId: tweet.userId,
-      userId: data.auth.uid,
-      tags: metadata.tags,
-      description: metadata.description,
-    }
-
-    const firestore = getFirestore()
-    await firestore.collection('tweets').doc(tweetId).set(tweetDoc)
-    return { success: true }
-  }
-)
-
-export const onTweetCreatedFn = functions.firestore.onDocumentCreated(
-  {
-    document: 'tweets/{tweetId}',
-    secrets: [pineconeApiKey, openaiApiKey],
-  },
-  async event => {
     try {
-      if (!event.data) {
-        console.error('No tweet data found. Empty document')
-        return
-      }
-      const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
-      const openai = new OpenAI({
-        apiKey: openaiApiKey.value(),
-      })
-
-      const tweetData = event.data.data() as TweetData
-      const tweetDocument = tweetDocumentSchema.parse(tweetData)
-
-      const tweetContentForEmbedding: TweetContentForEmbedding = {
-        text: tweetDocument.text,
-        description: tweetDocument.description,
-        authorUsername: tweetDocument.authorUsername,
-        authorId: tweetDocument.authorId,
-        createdAt: tweetDocument.createdAt,
-        tags: tweetDocument.tags,
+      if (!data.auth) {
+        throw new HttpsError('permission-denied', 'User not authenticated')
       }
 
-      const embedding = await openai.embeddings.create({
-        model: 'text-embedding-ada-002',
-        input: JSON.stringify(tweetContentForEmbedding, Object.keys(tweetContentForEmbedding).sort()),
-      })
+      // convert to a URL so that we can test the domain and so on
+      const url = new URL(data.data.url)
+      if (url.hostname !== 'x.com' && url.hostname !== 'twitter.com') {
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid tweet URL')
+      }
 
-      const indexId = getIndexId(tweetDocument.userId)
-      const index = pinecone.index(indexId)
+      const tweetId = url.pathname.split('/').pop()
+      if (!tweetId) {
+        throw new functions.https.HttpsError('invalid-argument', 'No tweet ID found')
+      }
 
-      await index.upsert([
-        {
-          id: tweetDocument.tweetId,
-          values: embedding.data[0].embedding,
-          metadata: {
-            text: tweetDocument.text,
-            authorUsername: tweetDocument.authorUsername,
-            authorId: tweetDocument.authorId,
-            createdAt: tweetDocument.createdAt,
-            tags: tweetDocument.tags,
-            description: tweetDocument.description,
-          },
-        },
-      ])
+      const metadata = data.data.userMetadata as UserMetadata
+      if (!metadata) {
+        throw new functions.https.HttpsError('invalid-argument', 'No user metadata found')
+      }
 
-      console.log('Tweet created and indexed')
-    } catch (error) {
-      console.error('Error creating tweet and indexing', error)
-      throw error
+      const scraper = new Scraper()
+      const tweetData = await scraper.getTweet(tweetId)
+      if (!tweetData) {
+        throw new functions.https.HttpsError('invalid-argument', 'Failed to fetch tweet data')
+      }
+      log('Fetched tweet data', { tweetId })
+
+      let tweet: ParsedTweet
+      try {
+        tweet = tweetSchema.parse(tweetData)
+      } catch (err) {
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid tweet returned from API')
+      }
+      log('Parsed tweet data', { tweet })
+
+      const resourceDoc: ResourceData = {
+        type: ResourceType.TWEET,
+        resourceId: tweetId,
+        createdAt: new Date(tweet.timestamp).toISOString(),
+        text: tweet.text,
+        authorUsername: tweet.username,
+        authorId: tweet.userId,
+        userId: data.auth.uid,
+        tags: metadata.tags,
+        description: metadata.description,
+      }
+
+      const firestore = getFirestore()
+      await firestore.collection('users').doc(data.auth.uid).collection('resources').doc(tweetId).set(resourceDoc)
+      log('Created resource document', { resourceDoc })
+
+      return { success: true }
+    } catch (err) {
+      error('createTweetDocument: ', err)
+      throw err
     }
   }
 )

@@ -1,8 +1,9 @@
 import { Pinecone } from '@pinecone-database/pinecone'
+import { getFirestore } from 'firebase-admin/firestore'
+import { error, log } from 'firebase-functions/logger'
 import * as functions from 'firebase-functions/v1'
-import { pineconeApiKey } from './secrets'
 import { DIMENSIONS, METRIC } from './constants'
-import { log, error } from 'firebase-functions/logger'
+import { pineconeApiKey } from './secrets'
 import { getIndexId } from './utils'
 
 export const onUserCreatedFn = functions
@@ -23,7 +24,18 @@ export const onUserCreatedFn = functions
           },
         },
       })
+      log('Index created', { indexId: getIndexId(event.uid) })
+
+      log('Creating user document', { userId: event.uid })
+      const firestore = getFirestore()
+      await firestore
+        .collection('users')
+        .doc(event.uid)
+        .set({
+          indexId: getIndexId(event.uid),
+        })
+      log('User document created', { userId: event.uid })
     } catch (err) {
-      error('Error creating index', err, event.uid)
+      error('onUserCreated: ', err, 'userId: ', event.uid)
     }
   })
