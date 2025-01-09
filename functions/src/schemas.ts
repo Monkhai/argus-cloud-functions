@@ -11,7 +11,7 @@ export const tweetSchema = z.object({
 })
 
 export const resourceDocumentSchema = z.object({
-  link: z.string(),
+  url: z.string(),
   type: z.enum(resourceType),
   resourceId: z.string(),
   createdAt: z.string(),

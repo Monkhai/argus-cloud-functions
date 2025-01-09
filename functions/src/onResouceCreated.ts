@@ -46,7 +46,7 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
       const index = pinecone.index(indexId)
 
       const indexEntryMetadata: IndexEntryMetadata = {
-        link: resourceDocument.link,
+        url: resourceDocument.url,
         resourceId: resourceDocument.resourceId,
         text: resourceDocument.text,
         type: ResourceType.TWEET,
