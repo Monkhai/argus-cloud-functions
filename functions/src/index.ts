@@ -1,12 +1,12 @@
 import * as admin from 'firebase-admin'
-import { createTweetDocumentFn } from './resources/twitter/createTweetDocument'
+import { deleteResourceFn } from './resources/deleteResource'
 import { getRecentResourcesFn } from './resources/getRecentResources'
 import { onResourceCreatedFn } from './resources/onResouceCreated'
-import { onUserCreatedFn } from './users/onUserCreated'
 import { searchResourcesFn } from './resources/searchResources'
-import { onUserDeletedFn } from './users/onUserDeleted'
 import { updateResourceFn } from './resources/updateResrouce'
-import { deleteResourceFn } from './resources/deleteResource'
+import { onUserCreatedFn } from './users/onUserCreated'
+import { onUserDeletedFn } from './users/onUserDeleted'
+import { createResourceDocumentFn } from './resources/createResourceDocument'
 
 admin.initializeApp()
 
@@ -19,9 +19,7 @@ export const onResourceCreated = onResourceCreatedFn
 //// resources
 export const updateResource = updateResourceFn
 export const deleteResource = deleteResourceFn
-
-//// Twitter
-export const createTweetDocument = createTweetDocumentFn
+export const createResourceDocument = createResourceDocumentFn
 
 //// Pinecone
 export const searchResources = searchResourcesFn

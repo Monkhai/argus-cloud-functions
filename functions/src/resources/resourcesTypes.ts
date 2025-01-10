@@ -25,11 +25,21 @@ export type ResourceContentForEmbedding = {
   authorUsername: string
   authorId: string
   createdAt: string
-  type: ResourceType | ''
+  type: ResourceType
 }
 
 export type IndexEntryMetadata = ResourceData
 
 export enum ResourceType {
   TWEET = 'tweet',
+}
+
+export type CreateResourceDocumentRequest = {
+  url: string
+  userMetadata: ResourceMetadata
+  type: ResourceType
+}
+
+export type CreateResourceDocumentResponse = {
+  success: boolean
 }
