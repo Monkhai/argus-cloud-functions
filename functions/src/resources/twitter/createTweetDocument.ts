@@ -44,6 +44,8 @@ export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentR
     }
     log('Fetched tweet data', { tweetId })
 
+    tweetData.timeParsed
+
     let tweet: ParsedTweet
     try {
       tweet = tweetSchema.parse(tweetData)
@@ -55,7 +57,7 @@ export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentR
     const resourceDoc: ResourceData = {
       type: ResourceType.TWEET,
       resourceId: tweetId,
-      createdAt: tweet.timeParsed,
+      createdAt: tweet.timeParsed.toISOString(),
       text: tweet.text,
       authorUsername: tweet.username,
       authorId: tweet.userId,
