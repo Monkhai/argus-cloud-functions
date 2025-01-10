@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ResourceData, resourceType } from './resourcesTypes'
+import { ResourceData, resourceType, ResourceMetadata } from './resourcesTypes'
 
 export type ParsedTweet = z.infer<typeof tweetSchema>
 
@@ -22,3 +22,8 @@ export const resourceDocumentSchema = z.object({
   tags: z.array(z.string()),
   description: z.string(),
 }) as z.ZodType<ResourceData>
+
+export const resourceMetadataSchema = z.object({
+  tags: z.array(z.string()),
+  description: z.string(),
+}) as z.ZodType<ResourceMetadata>

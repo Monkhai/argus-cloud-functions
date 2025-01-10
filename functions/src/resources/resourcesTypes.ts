@@ -1,4 +1,4 @@
-export type UserMetadata = {
+export type ResourceMetadata = {
   tags: string[]
   description: string
 }

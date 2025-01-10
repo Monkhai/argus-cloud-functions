@@ -4,11 +4,11 @@ import * as functions from 'firebase-functions'
 import { HttpsError } from 'firebase-functions/https'
 import { error, log } from 'firebase-functions/logger'
 import { ParsedTweet, tweetSchema } from '../resourcesSchemas'
-import { ResourceData, ResourceType, UserMetadata } from '../resourcesTypes'
+import { ResourceData, ResourceType, ResourceMetadata } from '../resourcesTypes'
 
 type CreateTweetDocumentRequest = {
   url: string
-  userMetadata: UserMetadata
+  userMetadata: ResourceMetadata
 }
 
 type CreateTweetDocumentResponse = {
@@ -32,7 +32,7 @@ export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentR
       throw new functions.https.HttpsError('invalid-argument', 'No tweet ID found')
     }
 
-    const metadata = req.data.userMetadata as UserMetadata
+    const metadata = req.data.userMetadata as ResourceMetadata
     if (!metadata) {
       throw new functions.https.HttpsError('invalid-argument', 'No user metadata found')
     }

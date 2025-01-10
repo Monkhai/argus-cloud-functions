@@ -5,6 +5,8 @@ import { onResourceCreatedFn } from './resources/onResouceCreated'
 import { onUserCreatedFn } from './users/onUserCreated'
 import { searchResourcesFn } from './resources/searchResources'
 import { onUserDeletedFn } from './users/onUserDeleted'
+import { updateResourceFn } from './resources/updateResrouce'
+import { deleteResourceFn } from './resources/deleteResource'
 
 admin.initializeApp()
 
@@ -14,6 +16,10 @@ export const onUserDeleted = onUserDeletedFn
 export const onResourceCreated = onResourceCreatedFn
 
 // CALLABLE FUNCTIONS
+//// resources
+export const updateResource = updateResourceFn
+export const deleteResource = deleteResourceFn
+
 //// Twitter
 export const createTweetDocument = createTweetDocumentFn
 
