@@ -4,7 +4,7 @@ import { error, log } from 'firebase-functions/logger'
 import * as functions from 'firebase-functions/v1'
 import { DIMENSIONS, METRIC } from '../constants'
 import { pineconeApiKey } from '../secrets'
-import { getIndexId } from '../utils'
+import { getIndexId } from '../utils/getPineconeIndexId'
 
 export const onUserCreatedFn = functions
   .runWith({ secrets: [pineconeApiKey] })

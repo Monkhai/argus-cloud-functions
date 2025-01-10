@@ -1,10 +1,10 @@
 import * as functions from 'firebase-functions'
-import { openaiApiKey, pineconeApiKey } from './secrets'
+import { openaiApiKey, pineconeApiKey } from '../secrets'
 import { HttpsError } from 'firebase-functions/https'
 import OpenAI from 'openai'
 import { Pinecone } from '@pinecone-database/pinecone'
-import { ResourceContentForEmbedding, ResourceData, ResourceType } from './types'
-import { getIndexId } from './utils'
+import { ResourceContentForEmbedding, ResourceData, ResourceType } from './resourcesTypes'
+import { getIndexId } from '../utils/getPineconeIndexId'
 import { error, log } from 'firebase-functions/logger'
 
 type SearchResourcesRequest = {

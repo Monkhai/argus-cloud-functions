@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ResourceData, resourceType } from './types'
+import { ResourceData, resourceType } from './resourcesTypes'
 
 export type ParsedTweet = z.infer<typeof tweetSchema>
 

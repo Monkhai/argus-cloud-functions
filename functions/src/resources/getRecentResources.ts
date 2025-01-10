@@ -1,6 +1,6 @@
 import { getFirestore } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
-import { ResourceData, ResourceType } from './types'
+import { ResourceData, ResourceType } from './resourcesTypes'
 import { error, log } from 'firebase-functions/logger'
 
 type GetRecentResourcesRequest = {

@@ -1,9 +1,9 @@
 import * as admin from 'firebase-admin'
-import { createTweetDocumentFn } from './createTweetDocument'
-import { getRecentResourcesFn } from './getRecentResources'
-import { onResourceCreatedFn } from './onResouceCreated'
+import { createTweetDocumentFn } from './resources/twitter/createTweetDocument'
+import { getRecentResourcesFn } from './resources/getRecentResources'
+import { onResourceCreatedFn } from './resources/onResouceCreated'
 import { onUserCreatedFn } from './users/onUserCreated'
-import { searchResourcesFn } from './searchResources'
+import { searchResourcesFn } from './resources/searchResources'
 import { onUserDeletedFn } from './users/onUserDeleted'
 
 admin.initializeApp()

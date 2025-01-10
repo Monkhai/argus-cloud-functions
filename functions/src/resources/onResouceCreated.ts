@@ -1,12 +1,12 @@
 import * as functions from 'firebase-functions'
 import { Pinecone } from '@pinecone-database/pinecone'
 import OpenAI from 'openai'
-import { openaiApiKey, pineconeApiKey } from './secrets'
-import { IndexEntryMetadata, ResourceContentForEmbedding, ResourceData, ResourceType } from './types'
-import { getIndexId } from './utils'
-import { resourceDocumentSchema } from './schemas'
+import { openaiApiKey, pineconeApiKey } from '../secrets'
+import { IndexEntryMetadata, ResourceContentForEmbedding, ResourceData, ResourceType } from './resourcesTypes'
+import { getIndexId } from '../utils/getPineconeIndexId'
+import { resourceDocumentSchema } from './resourcesSchemas'
 import { log, error } from 'firebase-functions/logger'
-import { abstractPathStore } from './pathStore'
+import { abstractPathStore } from '../pathStore'
 
 export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
   {
@@ -49,7 +49,7 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
         url: resourceDocument.url,
         resourceId: resourceDocument.resourceId,
         text: resourceDocument.text,
-        type: ResourceType.TWEET,
+        type: resourceDocument.type,
         authorUsername: resourceDocument.authorUsername,
         authorId: resourceDocument.authorId,
         createdAt: resourceDocument.createdAt,
