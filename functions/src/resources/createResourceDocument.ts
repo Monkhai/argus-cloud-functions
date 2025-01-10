@@ -2,11 +2,14 @@ import * as functions from 'firebase-functions'
 import { HttpsError } from 'firebase-functions/https'
 import { error, log } from 'firebase-functions/logger'
 import { CreateResourceDocumentRequest, CreateResourceDocumentResponse, ResourceData, ResourceType } from './resourcesTypes'
-import { getTweetData, GetTweetDataRequest } from './twitter/getTweetData'
+import { getTweetDocument } from './helpers/twitter/getTweetDocument'
 import { getFirestore } from 'firebase-admin/firestore'
+import { GetResourceDocumentArgs } from './helpers/helpersTypes'
+import { getArticleDocument } from './helpers/article/getArticleDocument'
 
-const getResourcesFns: Record<ResourceType, (req: GetTweetDataRequest) => Promise<ResourceData>> = {
-  [ResourceType.TWEET]: getTweetData,
+const getResourcesFns: Record<ResourceType, (req: GetResourceDocumentArgs) => Promise<ResourceData>> = {
+  [ResourceType.TWEET]: getTweetDocument,
+  [ResourceType.ARTICLE]: getArticleDocument,
 }
 
 export const createResourceDocumentFn = functions.https.onCall<CreateResourceDocumentRequest, Promise<CreateResourceDocumentResponse>>(

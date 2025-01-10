@@ -3,7 +3,7 @@ import { openaiApiKey, pineconeApiKey } from '../secrets'
 import { HttpsError } from 'firebase-functions/https'
 import OpenAI from 'openai'
 import { Pinecone } from '@pinecone-database/pinecone'
-import { ResourceContentForEmbedding, ResourceData, ResourceType } from './resourcesTypes'
+import { IndexEntryMetadata, ResourceContentForEmbedding, ResourceData, ResourceType } from './resourcesTypes'
 import { getIndexId } from '../utils/getPineconeIndexId'
 import { error, log } from 'firebase-functions/logger'
 
@@ -84,7 +84,25 @@ export const searchResourcesFn = functions.https.onCall<SearchResourcesRequest, 
       })
       log('Pinecone query response', { queryResponse })
 
-      return { resources: queryResponse.matches.map(match => match.metadata as ResourceData) }
+      return {
+        resources: queryResponse.matches.map(match => {
+          const metadata = match.metadata as IndexEntryMetadata
+          return {
+            type: metadata.type,
+            url: metadata.url,
+            resourceId: metadata.resourceId,
+            tags: metadata.tags,
+            description: metadata.description,
+            userId: metadata.userId,
+            data: {
+              text: metadata.text,
+              authorUsername: metadata.authorUsername,
+              authorId: metadata.authorId,
+              createdAt: metadata.createdAt,
+            },
+          } as ResourceData
+        }),
+      }
     } catch (err) {
       error('searchResources: ', err)
       throw err

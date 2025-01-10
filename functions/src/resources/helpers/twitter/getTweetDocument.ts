@@ -1,16 +1,11 @@
 import { Scraper } from '@the-convocation/twitter-scraper'
 import * as functions from 'firebase-functions'
 import { log } from 'firebase-functions/logger'
-import { ParsedTweet, tweetSchema } from '../resourcesSchemas'
-import { ResourceData, ResourceMetadata, ResourceType } from '../resourcesTypes'
+import { ParsedTweet, tweetSchema } from '../../resourcesSchemas'
+import { ResourceData, ResourceMetadata, ResourceType } from '../../resourcesTypes'
+import { GetResourceDocumentArgs } from '../helpersTypes'
 
-export type GetTweetDataRequest = {
-  url: string
-  metadata: ResourceMetadata
-  userId: string
-}
-
-export async function getTweetData(req: GetTweetDataRequest): Promise<ResourceData> {
+export async function getTweetDocument(req: GetResourceDocumentArgs): Promise<ResourceData> {
   const url = new URL(req.url)
   if (url.hostname !== 'x.com' && url.hostname !== 'twitter.com') {
     throw new functions.https.HttpsError('invalid-argument', 'Invalid tweet URL')
@@ -46,14 +41,16 @@ export async function getTweetData(req: GetTweetDataRequest): Promise<ResourceDa
   const resourceDoc: ResourceData = {
     type: ResourceType.TWEET,
     resourceId: tweetId,
-    createdAt: tweet.timeParsed.toISOString(),
-    text: tweet.text,
-    authorUsername: tweet.username,
-    authorId: tweet.userId,
     userId: req.userId,
     url: url.toString(),
     tags: metadata.tags,
     description: metadata.description,
+    data: {
+      createdAt: tweet.timeParsed.toISOString(),
+      authorUsername: tweet.username,
+      authorId: tweet.userId,
+      text: tweet.text,
+    },
   }
 
   return resourceDoc

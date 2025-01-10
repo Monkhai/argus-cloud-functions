@@ -3,7 +3,7 @@ import { pineconeApiKey } from '../secrets'
 import { error, log } from 'firebase-functions/logger'
 import { getIndexId } from '../utils/getPineconeIndexId'
 import { Pinecone } from '@pinecone-database/pinecone'
-import { IndexEntryMetadata, ResourceData, ResourceMetadata } from './resourcesTypes'
+import { IndexEntryMetadata, ResourceData, ResourceMetadata, TweetData } from './resourcesTypes'
 import { resourceDocumentSchema, resourceMetadataSchema } from './resourcesSchemas'
 import { pathStore } from '../pathStore'
 import { getFirestore } from 'firebase-admin/firestore'
@@ -45,7 +45,16 @@ export const updateResourceFn = functions.https.onCall<UpdateResourceRequest, Pr
       const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
       const index = pinecone.index(getIndexId(req.auth.uid))
       const indexEntryMetadata: IndexEntryMetadata = {
-        ...updatedResourceDocument,
+        description: updatedResourceDocument.description,
+        tags: updatedResourceDocument.tags,
+        resourceId: updatedResourceDocument.resourceId,
+        type: updatedResourceDocument.type,
+        url: updatedResourceDocument.url,
+        userId: updatedResourceDocument.userId,
+        text: updatedResourceDocument.data.text,
+        authorId: (updatedResourceDocument.data as TweetData).authorId ?? '',
+        authorUsername: (updatedResourceDocument.data as TweetData).authorUsername ?? '',
+        createdAt: (updatedResourceDocument.data as TweetData).createdAt ?? '',
       }
 
       await Promise.all([

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ResourceData, resourceType, ResourceMetadata } from './resourcesTypes'
+import { ResourceData, resourceType, ResourceMetadata, ArticleData, TweetData } from './resourcesTypes'
 
 export type ParsedTweet = z.infer<typeof tweetSchema>
 
@@ -10,17 +10,30 @@ export const tweetSchema = z.object({
   userId: z.string(),
 })
 
-export const resourceDocumentSchema = z.object({
-  url: z.string(),
-  type: z.enum(resourceType),
-  resourceId: z.string(),
-  createdAt: z.string(),
+export const articleSchema = z.object({
   text: z.string(),
+})
+
+export const tweetDataSchema = z.object({
+  createdAt: z.string().optional(),
   authorUsername: z.string(),
   authorId: z.string(),
-  userId: z.string(),
+  text: z.string(),
+}) as z.ZodType<TweetData>
+
+export const articleDataSchema = z.object({
+  text: z.string(),
+}) as z.ZodType<ArticleData>
+
+export const resourceDocumentSchema = z.object({
+  type: z.enum(resourceType),
+  url: z.string(),
+  resourceId: z.string(),
   tags: z.array(z.string()),
   description: z.string(),
+  userId: z.string(),
+
+  data: z.union([tweetDataSchema, articleDataSchema]),
 }) as z.ZodType<ResourceData>
 
 export const resourceMetadataSchema = z.object({

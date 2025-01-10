@@ -5,36 +5,52 @@ export type ResourceMetadata = {
 
 export const resourceType = ['tweet'] as const
 
-export type ResourceData = {
-  type: ResourceType
-  resourceId: string
-  createdAt: string
-  text: string
+export type TweetData = {
+  createdAt?: string
   authorUsername: string
   authorId: string
+  text: string
+}
+
+export type ArticleData = {
+  text: string
+}
+
+export type ResourceData = {
+  type: ResourceType
+  url: string
+  resourceId: string
   tags: string[]
   description: string
   userId: string
-  url: string
+
+  data: TweetData | ArticleData
 }
 
 export type ResourceContentForEmbedding = {
   text: string
   tags: string[]
   description: string
-  authorUsername: string
-  authorId: string
-  createdAt: string
+
+  authorUsername?: string
+  authorId?: string
+  createdAt?: string
   /*
   the empty string allows for the search query to embed the same json structure but without forcing the type field
   */
   type: ResourceType | ''
 }
 
-export type IndexEntryMetadata = ResourceData
+export type IndexEntryMetadata = Omit<ResourceData, 'data'> & {
+  text: string
+  authorUsername?: string
+  authorId?: string
+  createdAt?: string
+}
 
 export enum ResourceType {
   TWEET = 'tweet',
+  ARTICLE = 'article',
 }
 
 export type CreateResourceDocumentRequest = {

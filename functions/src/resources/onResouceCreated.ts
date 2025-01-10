@@ -1,12 +1,12 @@
-import * as functions from 'firebase-functions'
 import { Pinecone } from '@pinecone-database/pinecone'
+import * as functions from 'firebase-functions'
+import { error, log } from 'firebase-functions/logger'
 import OpenAI from 'openai'
+import { abstractPathStore } from '../pathStore'
 import { openaiApiKey, pineconeApiKey } from '../secrets'
-import { IndexEntryMetadata, ResourceContentForEmbedding, ResourceData, ResourceType } from './resourcesTypes'
 import { getIndexId } from '../utils/getPineconeIndexId'
 import { resourceDocumentSchema } from './resourcesSchemas'
-import { log, error } from 'firebase-functions/logger'
-import { abstractPathStore } from '../pathStore'
+import { IndexEntryMetadata, ResourceContentForEmbedding, ResourceData, TweetData } from './resourcesTypes'
 
 export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
   {
@@ -27,13 +27,13 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
       const resourceDocument = resourceDocumentSchema.parse(resourceData)
 
       const resourceContentForEmbedding: ResourceContentForEmbedding = {
-        type: ResourceType.TWEET,
-        text: resourceDocument.text,
-        description: resourceDocument.description,
-        authorUsername: resourceDocument.authorUsername,
-        authorId: resourceDocument.authorId,
-        createdAt: resourceDocument.createdAt,
+        type: resourceDocument.type,
+        text: resourceDocument.data.text,
         tags: resourceDocument.tags,
+        description: resourceDocument.description,
+        authorUsername: (resourceDocument.data as TweetData).authorUsername ?? '',
+        authorId: (resourceDocument.data as TweetData).authorId ?? '',
+        createdAt: (resourceDocument.data as TweetData).createdAt ?? '',
       }
 
       const embedding = await openai.embeddings.create({
@@ -48,14 +48,14 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
       const indexEntryMetadata: IndexEntryMetadata = {
         url: resourceDocument.url,
         resourceId: resourceDocument.resourceId,
-        text: resourceDocument.text,
         type: resourceDocument.type,
-        authorUsername: resourceDocument.authorUsername,
-        authorId: resourceDocument.authorId,
-        createdAt: resourceDocument.createdAt,
         tags: resourceDocument.tags,
         description: resourceDocument.description,
         userId: resourceDocument.userId,
+        text: resourceDocument.data.text,
+        authorUsername: (resourceDocument.data as TweetData).authorUsername ?? '',
+        authorId: (resourceDocument.data as TweetData).authorId ?? '',
+        createdAt: (resourceDocument.data as TweetData).createdAt ?? '',
       }
 
       await index.upsert([
