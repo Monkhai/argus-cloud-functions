@@ -15,7 +15,6 @@ export const articleSchema = z.object({
 })
 
 export const tweetDataSchema = z.object({
-  createdAt: z.string(),
   authorUsername: z.string(),
   authorId: z.string(),
   text: z.string(),
@@ -26,6 +25,7 @@ export const articleDataSchema = z.object({
 }) as z.ZodType<ArticleData>
 
 export const resourceDocumentSchema = z.object({
+  createdAt: z.string(),
   type: z.enum(resourceType),
   url: z.string(),
   resourceId: z.string(),

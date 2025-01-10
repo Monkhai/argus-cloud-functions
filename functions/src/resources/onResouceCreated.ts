@@ -31,9 +31,9 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
         text: resourceDocument.data.text,
         tags: resourceDocument.tags,
         description: resourceDocument.description,
+        createdAt: resourceDocument.createdAt,
         authorUsername: (resourceDocument.data as TweetData).authorUsername ?? '',
         authorId: (resourceDocument.data as TweetData).authorId ?? '',
-        createdAt: (resourceDocument.data as TweetData).createdAt ?? '',
       }
 
       const embedding = await openai.embeddings.create({
@@ -53,9 +53,9 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
         description: resourceDocument.description,
         userId: resourceDocument.userId,
         text: resourceDocument.data.text,
+        createdAt: resourceDocument.createdAt,
         authorUsername: (resourceDocument.data as TweetData).authorUsername ?? '',
         authorId: (resourceDocument.data as TweetData).authorId ?? '',
-        createdAt: (resourceDocument.data as TweetData).createdAt ?? '',
       }
 
       await index.upsert([

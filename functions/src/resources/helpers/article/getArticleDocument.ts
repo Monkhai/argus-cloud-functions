@@ -6,6 +6,7 @@ import { xAiApiKey } from '../../../secrets'
 import { articleSchema } from '../../resourcesSchemas'
 import { ArticleData, ResourceData, ResourceType } from '../../resourcesTypes'
 import { GetResourceDocumentArgs } from '../helpersTypes'
+import { Timestamp } from 'firebase-admin/firestore'
 
 const SYSTEM_PROMPT = `<prompt>
     <role>system</role>
@@ -70,6 +71,7 @@ export async function getArticleDocument(req: GetResourceDocumentArgs): Promise<
     url: req.url,
     tags: req.metadata.tags,
     description: req.metadata.description,
+    createdAt: Timestamp.now().toDate().toISOString(),
     data: {
       text: articleData.text,
     },

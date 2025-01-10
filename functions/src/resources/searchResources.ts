@@ -94,11 +94,11 @@ export const searchResourcesFn = functions.https.onCall<SearchResourcesRequest, 
             tags: metadata.tags,
             description: metadata.description,
             userId: metadata.userId,
+            createdAt: metadata.createdAt,
             data: {
               text: metadata.text,
               authorUsername: metadata.authorUsername,
               authorId: metadata.authorId,
-              createdAt: metadata.createdAt,
             },
           } as ResourceData
         }),

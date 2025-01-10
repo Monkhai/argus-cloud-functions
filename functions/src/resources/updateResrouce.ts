@@ -52,9 +52,9 @@ export const updateResourceFn = functions.https.onCall<UpdateResourceRequest, Pr
         url: updatedResourceDocument.url,
         userId: updatedResourceDocument.userId,
         text: updatedResourceDocument.data.text,
+        createdAt: updatedResourceDocument.createdAt,
         authorId: (updatedResourceDocument.data as TweetData).authorId ?? '',
         authorUsername: (updatedResourceDocument.data as TweetData).authorUsername ?? '',
-        createdAt: (updatedResourceDocument.data as TweetData).createdAt ?? '',
       }
 
       await Promise.all([

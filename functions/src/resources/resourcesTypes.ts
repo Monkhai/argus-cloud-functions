@@ -6,7 +6,6 @@ export type ResourceMetadata = {
 export const resourceType = ['tweet'] as const
 
 export type TweetData = {
-  createdAt: string
   authorUsername: string
   authorId: string
   text: string
@@ -18,6 +17,7 @@ export type ArticleData = {
 
 export type ResourceData = {
   type: ResourceType
+  createdAt: string
   url: string
   resourceId: string
   tags: string[]

@@ -4,6 +4,7 @@ import { log } from 'firebase-functions/logger'
 import { ParsedTweet, tweetSchema } from '../../resourcesSchemas'
 import { ResourceData, ResourceMetadata, ResourceType } from '../../resourcesTypes'
 import { GetResourceDocumentArgs } from '../helpersTypes'
+import { Timestamp } from 'firebase-admin/firestore'
 
 export async function getTweetDocument(req: GetResourceDocumentArgs): Promise<ResourceData> {
   const url = new URL(req.url)
@@ -45,8 +46,8 @@ export async function getTweetDocument(req: GetResourceDocumentArgs): Promise<Re
     url: url.toString(),
     tags: metadata.tags,
     description: metadata.description,
+    createdAt: Timestamp.now().toDate().toISOString(),
     data: {
-      createdAt: tweet.timeParsed.toISOString(),
       authorUsername: tweet.username,
       authorId: tweet.userId,
       text: tweet.text,
