@@ -25,7 +25,10 @@ export type ResourceContentForEmbedding = {
   authorUsername: string
   authorId: string
   createdAt: string
-  type: ResourceType
+  /*
+  the empty string allows for the search query to embed the same json structure but without forcing the type field
+  */
+  type: ResourceType | ''
 }
 
 export type IndexEntryMetadata = ResourceData
