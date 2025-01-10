@@ -15,7 +15,7 @@ export const articleSchema = z.object({
 })
 
 export const tweetDataSchema = z.object({
-  createdAt: z.string().optional(),
+  createdAt: z.string(),
   authorUsername: z.string(),
   authorId: z.string(),
   text: z.string(),

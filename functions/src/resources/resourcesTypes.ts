@@ -6,7 +6,7 @@ export type ResourceMetadata = {
 export const resourceType = ['tweet'] as const
 
 export type TweetData = {
-  createdAt?: string
+  createdAt: string
   authorUsername: string
   authorId: string
   text: string
