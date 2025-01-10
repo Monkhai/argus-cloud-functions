@@ -4,7 +4,7 @@ import { ResourceData, resourceType, ResourceMetadata } from './resourcesTypes'
 export type ParsedTweet = z.infer<typeof tweetSchema>
 
 export const tweetSchema = z.object({
-  timestamp: z.number(),
+  timeParsed: z.string(),
   text: z.string(),
   username: z.string(),
   userId: z.string(),

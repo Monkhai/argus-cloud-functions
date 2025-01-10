@@ -55,7 +55,7 @@ export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentR
     const resourceDoc: ResourceData = {
       type: ResourceType.TWEET,
       resourceId: tweetId,
-      createdAt: new Date(tweet.timestamp).toISOString(),
+      createdAt: tweet.timeParsed,
       text: tweet.text,
       authorUsername: tweet.username,
       authorId: tweet.userId,
