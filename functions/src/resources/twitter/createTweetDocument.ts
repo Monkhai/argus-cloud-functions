@@ -50,7 +50,7 @@ export const createTweetDocumentFn = functions.https.onCall<CreateTweetDocumentR
     try {
       tweet = tweetSchema.parse(tweetData)
     } catch (err) {
-      throw new functions.https.HttpsError('invalid-argument', 'Invalid tweet returned from API')
+      throw new functions.https.HttpsError('invalid-argument', 'Failed to parse tweet data')
     }
     log('Parsed tweet data', { tweet })
 
