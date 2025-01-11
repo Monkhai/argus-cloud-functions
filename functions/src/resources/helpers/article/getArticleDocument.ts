@@ -16,7 +16,7 @@ const SYSTEM_PROMPT = `<prompt>
     </task>
     <considerations>
         <purpose>
-            This summary is not for human reading; it is for generating 
+            This summary is for both human reading and generating 
             embeddings that will be used for semantic search.
         </purpose>
         <length>
@@ -38,6 +38,7 @@ const SYSTEM_PROMPT = `<prompt>
         3. Refrain from injecting personal commentary, speculation, or opinions.
         4. Emphasize critical information: who, what, when, where, why, how (if applicable).
         5. The output must be embedding-ready, focusing on key terms, context, and important details for semantic search.
+        6. The output must not have any markdown formatting.
     </instructions>
     <output_format>
         Return the summarized content in plain text, either as:
@@ -66,6 +67,7 @@ export async function getArticleDocument(req: GetResourceDocumentArgs): Promise<
 
   const resourceDoc: ResourceData = {
     type: ResourceType.ARTICLE,
+    title: req.metadata.title,
     resourceId,
     userId: req.userId,
     url: req.url,

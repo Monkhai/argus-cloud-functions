@@ -28,6 +28,7 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
 
       const resourceContentForEmbedding: ResourceContentForEmbedding = {
         type: resourceDocument.type,
+        title: resourceDocument.title,
         text: resourceDocument.data.text,
         tags: resourceDocument.tags,
         description: resourceDocument.description,
@@ -47,6 +48,7 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
 
       const indexEntryMetadata: IndexEntryMetadata = {
         url: resourceDocument.url,
+        title: resourceDocument.title,
         resourceId: resourceDocument.resourceId,
         type: resourceDocument.type,
         tags: resourceDocument.tags,

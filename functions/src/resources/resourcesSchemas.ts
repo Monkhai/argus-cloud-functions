@@ -26,6 +26,7 @@ export const articleDataSchema = z.object({
 
 export const resourceDocumentSchema = z.object({
   createdAt: z.string(),
+  title: z.string(),
   type: z.enum(resourceType),
   url: z.string(),
   resourceId: z.string(),
@@ -37,6 +38,7 @@ export const resourceDocumentSchema = z.object({
 }) as z.ZodType<ResourceData>
 
 export const resourceMetadataSchema = z.object({
+  title: z.string(),
   tags: z.array(z.string()),
   description: z.string(),
 }) as z.ZodType<ResourceMetadata>

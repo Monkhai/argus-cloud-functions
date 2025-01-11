@@ -13,6 +13,7 @@ type SearchResourcesRequest = {
   tags?: string[]
   description?: string
   type?: ResourceType
+  title?: string
 }
 
 type SearchResourcesResponse = {
@@ -68,6 +69,7 @@ export const searchResourcesFn = functions.https.onCall<SearchResourcesRequest, 
         description: req.data.description || '',
         tags: req.data.tags || [],
         authorUsername: req.data.authorUsername || '',
+        title: req.data.title || '',
       })
 
       const embeddedPrompt = await openai.embeddings.create({
@@ -136,17 +138,20 @@ const getStructuredQuery = ({
   description,
   query,
   tags,
+  title,
 }: {
   query: string
   tags: string[]
   description: string
   authorUsername: string
+  title: string
 }): ResourceContentForEmbedding => {
   return {
     text: query,
     authorUsername,
     tags,
     description,
+    title,
     authorId: '',
     createdAt: '',
     type: '',

@@ -41,6 +41,7 @@ export async function getTweetDocument(req: GetResourceDocumentArgs): Promise<Re
 
   const resourceDoc: ResourceData = {
     type: ResourceType.TWEET,
+    title: req.metadata.title,
     resourceId: tweetId,
     userId: req.userId,
     url: url.toString(),

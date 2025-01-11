@@ -6,6 +6,7 @@ import { getTweetDocument } from './helpers/twitter/getTweetDocument'
 import { getFirestore } from 'firebase-admin/firestore'
 import { GetResourceDocumentArgs } from './helpers/helpersTypes'
 import { getArticleDocument } from './helpers/article/getArticleDocument'
+import { xAiApiKey } from '../secrets'
 
 const getResourcesFns: Record<ResourceType, (req: GetResourceDocumentArgs) => Promise<ResourceData>> = {
   [ResourceType.TWEET]: getTweetDocument,
@@ -13,6 +14,7 @@ const getResourcesFns: Record<ResourceType, (req: GetResourceDocumentArgs) => Pr
 }
 
 export const createResourceDocumentFn = functions.https.onCall<CreateResourceDocumentRequest, Promise<CreateResourceDocumentResponse>>(
+  { secrets: [xAiApiKey] },
   async req => {
     try {
       if (!req.auth) {

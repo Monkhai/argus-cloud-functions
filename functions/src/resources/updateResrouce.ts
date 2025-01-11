@@ -45,6 +45,7 @@ export const updateResourceFn = functions.https.onCall<UpdateResourceRequest, Pr
       const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
       const index = pinecone.index(getIndexId(req.auth.uid))
       const indexEntryMetadata: IndexEntryMetadata = {
+        title: updatedResourceDocument.title,
         description: updatedResourceDocument.description,
         tags: updatedResourceDocument.tags,
         resourceId: updatedResourceDocument.resourceId,
