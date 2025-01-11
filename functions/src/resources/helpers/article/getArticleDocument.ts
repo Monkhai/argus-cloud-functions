@@ -66,6 +66,7 @@ export async function getArticleDocument(req: GetResourceDocumentArgs): Promise<
 
   const resourceDoc: ResourceData = {
     type: ResourceType.ARTICLE,
+    title: req.metadata.title,
     resourceId,
     userId: req.userId,
     url: req.url,
