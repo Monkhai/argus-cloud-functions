@@ -16,6 +16,7 @@
   "dependencies": {
     "@ai-sdk/xai": "^1.0.17",
     "@distube/ytdl-core": "^4.15.8",
+    "@google-cloud/speech": "^6.7.0",
     "@pinecone-database/pinecone": "^4.0.0",
     "@the-convocation/twitter-scraper": "^0.14.1",
     "ai": "^4.0.33",
