@@ -17,9 +17,9 @@ export const onResourceCreated = onResourceCreatedFn
 
 // CALLABLE FUNCTIONS
 //// resources
+export const createResourceDocument = createResourceDocumentFn
 export const updateResource = updateResourceFn
 export const deleteResource = deleteResourceFn
-export const createResourceDocument = createResourceDocumentFn
 
 //// Pinecone
 export const searchResources = searchResourcesFn
