@@ -1,12 +1,12 @@
 import { createXai } from '@ai-sdk/xai'
 import { generateText } from 'ai'
+import { Timestamp } from 'firebase-admin/firestore'
 import { log } from 'firebase-functions/logger'
 import { v4 as getUUID } from 'uuid'
 import { xAiApiKey } from '../../../secrets'
 import { articleSchema } from '../../resourcesSchemas'
 import { ArticleData, ResourceData, ResourceType } from '../../resourcesTypes'
 import { GetResourceDocumentArgs } from '../helpersTypes'
-import { Timestamp } from 'firebase-admin/firestore'
 
 const SYSTEM_PROMPT = `<prompt>
     <role>system</role>
@@ -59,6 +59,7 @@ export async function getArticleDocument(req: GetResourceDocumentArgs): Promise<
     system: SYSTEM_PROMPT,
     prompt: `<article>${req.url}</article>`,
   })
+  log('Article response', { response })
 
   const articleData: ArticleData = articleSchema.parse(response)
   log('Article data parsed', { articleData })

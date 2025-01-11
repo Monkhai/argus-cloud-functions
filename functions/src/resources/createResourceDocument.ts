@@ -21,9 +21,8 @@ export const createResourceDocumentFn = functions.https.onCall<CreateResourceDoc
         throw new HttpsError('permission-denied', 'User not authenticated')
       }
 
-      const { url, userMetadata } = req.data
-      const resourceType = req.data.type
-      const getResourceDataFn = getResourcesFns[resourceType]
+      const { url, userMetadata, type } = req.data
+      const getResourceDataFn = getResourcesFns[type]
       const resourceDoc = await getResourceDataFn({ url, metadata: userMetadata, userId: req.auth.uid })
 
       const firestore = getFirestore()
