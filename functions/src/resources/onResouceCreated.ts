@@ -18,6 +18,7 @@ export const onResourceCreatedFn = functions.firestore.onDocumentCreated(
       if (!event.data) {
         throw new Error('No tweet data found. Empty document')
       }
+
       const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
       const openai = new OpenAI({
         apiKey: openaiApiKey.value(),

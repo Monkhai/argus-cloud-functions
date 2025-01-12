@@ -7,6 +7,7 @@ import { updateResourceFn } from './resources/updateResrouce'
 import { onUserCreatedFn } from './users/onUserCreated'
 import { onUserDeletedFn } from './users/onUserDeleted'
 import { createResourceDocumentFn } from './resources/createResourceDocument'
+import { downloadYoutubeVideoFn } from './resources/downloadResourceYoutube'
 
 admin.initializeApp()
 
@@ -20,6 +21,9 @@ export const onResourceCreated = onResourceCreatedFn
 export const createResourceDocument = createResourceDocumentFn
 export const updateResource = updateResourceFn
 export const deleteResource = deleteResourceFn
+
+//// youtube
+export const downloadYoutubeVideo = downloadYoutubeVideoFn
 
 //// Pinecone
 export const searchResources = searchResourcesFn

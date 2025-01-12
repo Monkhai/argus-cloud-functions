@@ -38,34 +38,33 @@ export const searchResourcesFn = functions.https.onCall<SearchResourcesRequest, 
         dangerouslyAllowBrowser: true,
       })
 
-      const enrichedPromptResponse = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'system',
-            content: ENRICHMENT_SYSTEM_PROMPT,
-          },
-          {
-            role: 'user',
-            content: `<query>${prompt}</query>`,
-          },
-        ],
-      })
+      // const enrichedPromptResponse = await openai.chat.completions.create({
+      //   model: 'gpt-4o-mini',
+      //   messages: [
+      //     {
+      //       role: 'system',
+      //       content: ENRICHMENT_SYSTEM_PROMPT,
+      //     },
+      //     {
+      //       role: 'user',
+      //       content: `<query>${prompt}</query>`,
+      //     },
+      //   ],
+      // })
 
-      log('Enriched prompt response', { enrichedPromptResponse })
+      // log('Enriched prompt response', { enrichedPromptResponse })
 
-      const enrichedPrompt = enrichedPromptResponse.choices[0].message.content
-      if (!enrichedPrompt) {
-        throw new functions.https.HttpsError('data-loss', 'Enriched prompt not found')
-      }
-
-      log('Enriched prompt content', { enrichedPrompt })
+      // const enrichedPrompt = enrichedPromptResponse.choices[0].message.content
+      // if (!enrichedPrompt) {
+      //   throw new functions.https.HttpsError('data-loss', 'Enriched prompt not found')
+      // }
+      // log('Enriched prompt content', { enrichedPrompt })
 
       const pinecone = new Pinecone({ apiKey: pineconeApiKey.value() })
       const index = pinecone.index(getIndexId(req.auth.uid))
 
       const resourceToEmbed = getStructuredQuery({
-        query: enrichedPrompt,
+        query: prompt,
         description: req.data.description || '',
         tags: req.data.tags || [],
         authorUsername: req.data.authorUsername || '',
@@ -76,7 +75,7 @@ export const searchResourcesFn = functions.https.onCall<SearchResourcesRequest, 
         input: JSON.stringify(resourceToEmbed, Object.keys(resourceToEmbed).sort()),
         model: 'text-embedding-ada-002',
       })
-      log('Embedded prompt', { embeddedPrompt })
+      log('Embedded prompt')
 
       const queryVector = embeddedPrompt.data[0].embedding
       const queryResponse = await index.query({
@@ -112,26 +111,26 @@ export const searchResourcesFn = functions.https.onCall<SearchResourcesRequest, 
   }
 )
 
-const ENRICHMENT_SYSTEM_PROMPT = `<role>
-You are helping to create a concise and effective search query for semantic search of resources such as articles, videos, tweets, podcasts, and other resources.
-</role>
+// const ENRICHMENT_SYSTEM_PROMPT = `<role>
+// You are helping to create a concise and effective search query for semantic search of resources such as articles, videos, tweets, podcasts, and other resources.
+// </role>
 
-<task>
-Expand and enrich the given search query to improve semantic matching by including related terms and concepts.
-</task>
+// <task>
+// Expand and enrich the given search query to improve semantic matching by including related terms and concepts.
+// </task>
 
-<instructions>
-- Focus on relevant terms, keywords, and phrases.
-- Avoid using instructive or procedural language (e.g., "looking for" or "discussing").
-- Do not include unnecessary descriptors or explanations.
-- Keep the output concise and keyword-rich, focusing solely on concepts related to the query.
-- Use full sentences and natural language.
-- Ensure the query is short. No longer than 10 words more than the original query.
-</instructions>
+// <instructions>
+// - Focus on relevant terms, keywords, and phrases.
+// - Avoid using instructive or procedural language (e.g., "looking for" or "discussing").
+// - Do not include unnecessary descriptors or explanations.
+// - Keep the output concise and keyword-rich, focusing solely on concepts related to the query.
+// - Use full sentences and natural language.
+// - Ensure the query is short. No longer than 10 words more than the original query.
+// </instructions>
 
-<output_format>
-Return only the enriched query text as a single line of keywords and phrases. Avoid full sentences or explanations.
-</output_format>`
+// <output_format>
+// Return only the enriched query text as a single line of keywords and phrases. Avoid full sentences or explanations.
+// </output_format>`
 
 const getStructuredQuery = ({
   authorUsername,
