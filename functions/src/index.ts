@@ -8,6 +8,7 @@ import { onUserCreatedFn } from './users/onUserCreated'
 import { onUserDeletedFn } from './users/onUserDeleted'
 import { createResourceDocumentFn } from './resources/createResourceDocument'
 import { downloadYoutubeVideoFn } from './resources/downloadResourceYoutube'
+import { getOneResourceFn } from './resources/getOneResource'
 
 admin.initializeApp()
 
@@ -30,3 +31,4 @@ export const searchResources = searchResourcesFn
 
 //// Firestore
 export const getRecentResources = getRecentResourcesFn
+export const getOneResource = getOneResourceFn
